@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { setSort, TSort, ESortProperty } from '../redux/slices/filterSlice';
+import { setSort, TSort } from '../redux/slices/filterSlice';
 import { useAppDispatch } from '../redux/store';
+import { ESortProperty } from '../@types/enum_types';
 
 export const listSort: TSort[] = [
   { name: 'популярности', sortProperty: ESortProperty.RATING_ASC },

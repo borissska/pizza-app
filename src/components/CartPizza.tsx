@@ -1,18 +1,12 @@
 import { addPizza, removePizza, removePizzas } from '../redux/slices/cartSlice';
 import React from 'react';
 import { useAppDispatch } from '../redux/store';
+import { TThePizza } from '../redux/slices/pizzasSlice';
 
-type CartPizzaProps = {
-  id: string;
-  title: string;
-  imageUrl: string;
-  type: string;
-  size: number;
-  count: number;
-  price: number;
-};
+const typeNames = ['тонкое', 'традиционное'];
+const sizeNames = [26, 30, 40];
 
-const CartPizza: React.FC<CartPizzaProps> = (pizza) => {
+const CartPizza: React.FC<TThePizza> = (pizza) => {
   const dispatch = useAppDispatch();
 
   const onClickMinus = () => {
@@ -31,7 +25,7 @@ const CartPizza: React.FC<CartPizzaProps> = (pizza) => {
       <div className='cart__item-info'>
         <h3>{pizza.title}</h3>
         <p>
-          {pizza.type}, {pizza.size} см.
+          {typeNames[pizza.type]}, {sizeNames[pizza.size]} см.
         </p>
       </div>
       <div className='cart__item-count'>

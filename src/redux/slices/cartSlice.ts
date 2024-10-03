@@ -1,22 +1,22 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
-import { TPizza } from './pizzasSlice';
+import { TThePizza } from './pizzasSlice';
 
 interface ICartSliceState {
   totalPrice: number;
   totalCount: number;
-  pizzas: TPizza[];
+  pizzas: TThePizza[];
 }
 
 const getCartFromLS = () => {
   const data = localStorage.getItem('cart');
-  let answer: TPizza[] = [];
+  let answer: TThePizza[] = [];
   let totalPrice: number = 0;
   let totalCount: number = 0;
   if (data) {
     answer = JSON.parse(data);
-    totalPrice = answer.reduce((sum: number, obj: TPizza) => sum + obj.price * obj.count, 0);
-    totalCount = answer.reduce((sum: number, obj: TPizza) => sum + obj.count, 0);
+    totalPrice = answer.reduce((sum: number, obj: TThePizza) => sum + obj.price * obj.count, 0);
+    totalCount = answer.reduce((sum: number, obj: TThePizza) => sum + obj.count, 0);
   }
   return { 
     pizzas: answer, 
@@ -45,8 +45,8 @@ export const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    addPizza(state, action: PayloadAction<TPizza>) {
-      const findItem = state.pizzas.find((obj) => obj.id === action.payload.id);
+    addPizza(state, action: PayloadAction<TThePizza>) {
+      const findItem = state.pizzas.find((obj) => ((obj.id === action.payload.id) && (obj.type === action.payload.type) && (obj.size === action.payload.size) && (obj.additives_ingr === action.payload.additives_ingr)));
 
       if (findItem) {
         findItem.count++;
@@ -56,7 +56,7 @@ export const cartSlice = createSlice({
 
       updateTotal(state);
     },
-    removePizza(state, action: PayloadAction<string>) {
+    removePizza(state, action: PayloadAction<number>) {
       const findItem = state.pizzas.find((obj) => obj.id === action.payload);
 
       if (findItem) {
@@ -69,7 +69,7 @@ export const cartSlice = createSlice({
 
       updateTotal(state);
     },
-    removePizzas(state, action: PayloadAction<string>) {
+    removePizzas(state, action: PayloadAction<number>) {
       state.pizzas = state.pizzas.filter((obj) => obj.id !== action.payload);
 
       updateTotal(state);
@@ -83,8 +83,9 @@ export const cartSlice = createSlice({
 });
 
 export const selectCart = (state: RootState) => state.cart;
-export const selectCartPizzaById = (id: string) => (state: RootState) =>
-  state.cart.pizzas.find((obj) => obj.id === id);
+export const selectCartPizza = (id: number, size: number, type: number, additives_ingr: string[]) => (state: RootState) => {
+  return state.cart.pizzas.find((obj) => ((obj.id === id) && (obj.type === type) && (obj.size === size) && (obj.additives_ingr === additives_ingr)));
+}
 
 export const { addPizza, removePizza, removePizzas, clearPizzas } = cartSlice.actions;
 

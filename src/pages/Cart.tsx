@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { CartPizza, CartEmpty } from '../components';
 import { clearPizzas, selectCart } from '../redux/slices/cartSlice';
 import { useAppDispatch } from '../redux/store';
+import { TThePizza } from '../redux/slices/pizzasSlice';
 
 const Cart: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -96,7 +97,7 @@ const Cart: React.FC = () => {
           </div>
         </div>
         <div className='cart__items'>
-          {pizzas.map((pizza: any) => (
+          {pizzas.map((pizza: TThePizza) => (
             <CartPizza key={pizza.id} {...pizza} />
           ))}
         </div>
@@ -106,7 +107,7 @@ const Cart: React.FC = () => {
               {' '}
               Всего пицц:{' '}
               <b>
-                {pizzas.reduce((sum: number, obj: any) => {
+                {pizzas.reduce((sum: number, obj: TThePizza) => {
                   return sum + obj.count;
                 }, 0)}{' '}
                 шт.

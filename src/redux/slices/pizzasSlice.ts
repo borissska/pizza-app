@@ -1,22 +1,33 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { RootState } from '../store';
+import { EStatus } from '../../@types/enum_types';
 
-export enum EStatus {
-  LOADING = 'loading',
-  SUCCESS = 'success',
-  ERROR = 'error'
-}
-
-export type TPizza = {
-  id: string;
+export type TAPizza = {
+  id: number;
   title: string;
+  info: string;
+  additives_ingr: string[];
+  additives_price: number[][];
+  imageUrl: string;
+  price: number[];
+  sizes: number[];
+  types: number[];
+  count: number;
+};
+
+export type TThePizza = {
+  id: number;
+  title: string;
+  info: string;
+  additives_ingr: string[];
+  additives_price: number[][];
   price: number;
   imageUrl: string;
   size: number;
-  type: string;
+  type: number;
   count: number;
-}
+};
 
 export type TFetchPizzasArgs = {
   categoryIf: string;
@@ -24,10 +35,10 @@ export type TFetchPizzasArgs = {
   sortIf: string;
   currentPage: number;
   sortType: string;
-}
+};
 
 interface IPizzaSliceState {
-  pizzas: TPizza[];
+  pizzas: TAPizza[];
   status: EStatus;
 }
 
@@ -36,23 +47,26 @@ const initialState: IPizzaSliceState = {
   status: EStatus.LOADING,
 };
 
-export const fetchPizzas = createAsyncThunk<TPizza[], TFetchPizzasArgs>('pizza/fetchPizzas', async (params: TFetchPizzasArgs) => {
-  const { categoryIf, sortIf, search, currentPage, sortType } = params;
-  const { data } = await axios.get<TPizza[]>(
-    `https://66bb5ce96a4ab5edd6383355.mockapi.io/pizzas?page=${currentPage}&limit=8&${categoryIf}&sortBy=${sortType.replace(
-      '-',
-      '',
-    )}&order=${sortIf}${search}`,
-  );
+export const fetchPizzas = createAsyncThunk<TAPizza[], TFetchPizzasArgs>(
+  'pizza/fetchPizzas',
+  async (params: TFetchPizzasArgs) => {
+    const { categoryIf, sortIf, search, currentPage, sortType } = params;
+    const { data } = await axios.get<TAPizza[]>(
+      `https://66bb5ce96a4ab5edd6383355.mockapi.io/pizzas?page=${currentPage}&limit=8&${categoryIf}&sortBy=${sortType.replace(
+        '-',
+        '',
+      )}&order=${sortIf}${search}`,
+    );
 
-  return data;
-});
+    return data;
+  },
+);
 
 export const pizzasSlice = createSlice({
-  name: 'pizza',
+  name: 'pizzas',
   initialState,
   reducers: {
-    setPizzas(state, action: PayloadAction<TPizza[]>) {
+    setPizzas(state, action: PayloadAction<TAPizza[]>) {
       state.pizzas = action.payload;
     },
   },
@@ -68,13 +82,12 @@ export const pizzasSlice = createSlice({
       })
       .addCase(fetchPizzas.rejected, (state) => {
         state.status = EStatus.ERROR;
-        ;
         state.pizzas = [];
       });
   },
 });
 
-export const selectPizza = (state: RootState) => state.pizza;
+export const selectPizzas = (state: RootState) => state.pizzas;
 
 export const { setPizzas } = pizzasSlice.actions;
 

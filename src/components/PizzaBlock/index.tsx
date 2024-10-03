@@ -1,54 +1,53 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { addPizza, selectCartPizzaById } from '../../redux/slices/cartSlice';
-import { TPizza } from '../../redux/slices/pizzasSlice';
+import { addPizza, selectCartPizza } from '../../redux/slices/cartSlice';
+import { TAPizza, TThePizza } from '../../redux/slices/pizzasSlice';
 import { useAppDispatch } from '../../redux/store';
+import { setActive } from '../../redux/slices/modalSlice';
 
 const typeNames = ['тонкое', 'традиционное'];
+const sizeNames = [26, 30, 40];
 
-type PizzaBlockProps = {
-  id: string;
-  title: string;
-  price: number;
-  imageUrl: string;
-  sizes: number[];
-  types: number[];
-  count: number;
-};
-
-const PizzaBlock: React.FC<PizzaBlockProps> = ({ id, title, price, imageUrl, sizes, types }) => {
-  const [activeSize, setActiveSize] = React.useState(sizes[0]);
-  const [activeType, setActiveType] = React.useState(types[0]);
+const PizzaBlock: React.FC<TAPizza> = (apizza) => {
+  const [activeSize, setActiveSize] = React.useState(apizza.sizes[0]);
+  const [activeType, setActiveType] = React.useState(apizza.types[0]);
 
   const dispatch = useAppDispatch();
-  const cartPizzas = useSelector(selectCartPizzaById(id));
-  const addedCount = cartPizzas ? cartPizzas.count : 0;
+  const cartPizza = useSelector(selectCartPizza(apizza.id, activeSize, activeType, apizza.additives_ingr));
+  const addedCount = cartPizza ? cartPizza.count : 0;
+  const pricePizza = apizza.price[activeSize]
 
   const onClickAdd = () => {
-    const pizza: TPizza = {
-      id,
-      title,
-      price,
-      imageUrl,
-      type: typeNames[activeType],
+    const thepizza: TThePizza = {
+      id: apizza.id,
+      title: apizza.title,
+      info: apizza.info,
+      imageUrl: apizza.imageUrl,
+      additives_ingr: apizza.additives_ingr,
+      additives_price: apizza.additives_price,
+      price: pricePizza,
+      type: activeType,
       size: activeSize,
       count: 0,
     };
 
-    dispatch(addPizza(pizza));
+    dispatch(addPizza(thepizza));
   };
+
+  const onClickPizza = () => {
+    dispatch(setActive(apizza))
+  }
 
   return (
     <div className='pizza-block-wrapper'>
       <div className='pizza-block'>
-        <Link to={`/pizza/${id}`}>
-          <img className='pizza-block__image' src={imageUrl} alt='Pizza' />
-          <h4 className='pizza-block__title'>{title}</h4>
-        </Link>
+        <div className='pizza-block__modal' onClick={onClickPizza}>
+          <img className='pizza-block__image' src={apizza.imageUrl} alt='Pizza' />
+          <h4 className='pizza-block__title'>{apizza.title}</h4>
+        </div>
         <div className='pizza-block__selector'>
           <ul>
-            {types.map((value) => (
+            {apizza.types.map((value) => (
               <li
                 key={value}
                 className={activeType === value ? 'active' : ''}
@@ -59,19 +58,19 @@ const PizzaBlock: React.FC<PizzaBlockProps> = ({ id, title, price, imageUrl, siz
             ))}
           </ul>
           <ul>
-            {sizes.map((value) => (
+            {apizza.sizes.map((value) => (
               <li
                 key={value}
                 className={activeSize === value ? 'active' : ''}
                 onClick={() => setActiveSize(value)}
               >
-                {value} см.
+                {sizeNames[value]} см.
               </li>
             ))}
           </ul>
         </div>
         <div className='pizza-block__bottom'>
-          <div className='pizza-block__price'>от {price} ₽</div>
+          <div className='pizza-block__price'>от {apizza.price[activeSize]} ₽</div>
           <button onClick={onClickAdd} className='button button--outline button--add'>
             <svg
               width='12'
@@ -86,7 +85,7 @@ const PizzaBlock: React.FC<PizzaBlockProps> = ({ id, title, price, imageUrl, siz
               />
             </svg>
             <span>Добавить</span>
-            {addedCount > 0 && <i>{cartPizzas ? cartPizzas.count : 0}</i>}
+            {addedCount > 0 && <i>{cartPizza ? cartPizza.count : 0}</i>}
           </button>
         </div>
       </div>

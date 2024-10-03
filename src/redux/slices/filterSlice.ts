@@ -1,14 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
-
-export enum ESortProperty {
-  RATING_ASC = 'rating',
-  RATING_DESC = 'rating-',
-  PRICE_ASC = 'price',
-  PRICE_DESC = 'price-',
-  TITLE_ASC = 'title',
-  TITLE_DESC = 'title-',
-}
+import { ESortProperty } from '../../@types/enum_types';
 
 export type TSort = {
   name: string;
